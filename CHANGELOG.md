@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [v0.1.0](https://github.com/Bejibun-Framework/bejibun-limiter/compare/v0.1.0...v0.1.0) - 2026-08-16
+## [v0.1.1](https://github.com/Bejibun-Framework/bejibun-limiter/compare/v0.1.1...v0.1.1) - 2026-08-16
 
 ### 🩹 Fixes
 
