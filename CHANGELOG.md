@@ -8,33 +8,29 @@ All notable changes to this project will be documented in this file.
 ### 🩹 Fixes
 
 ### 📖 Changes
-Initial release of `@bejibun/limiter` -- a filesystem abstraction for the Bejibun Framework, providing a single API over local disk and S3-compatible limiter.
+Initial release of `@bejibun/limiter` -- a rate limiter for the Bejibun Framework, providing a simple key-based API to throttle repeated actions (e.g. login attempts, API calls) using a cache-backed counter.
 
-**Disk drivers:**
-- `local` -- reads/writes files on the local filesystem
-- `s3` -- reads/writes files to an S3-compatible bucket (endpoint, region, bucket, credentials configurable)
-  **`Limiter` facade / `LimiterBuilder`:**
-- `.disk(name)` -- select a configured disk by name
-- `.build(disk)` -- use an ad-hoc disk config at runtime, without touching `config/limiter.ts`
-- `.exists(path)` / `.missing(path)` -- check file presence
-- `.metadata(path)` -- get file `Stats` (local) or `S3Stats` (S3)
-- `.size(path)` -- get file size in bytes
-- `.mimeType(path)` -- detect file MIME type
-- `.lastModified(path)` -- get last-modified date
-- `.get(path)` -- retrieve a `Bun.BunFile` or `Bun.S3File`
-- `.put(path, content, options?)` -- write content to a file
-- `.copy(source, destination, options?)` -- copy a file
-- `.move(source, destination, options?)` -- move a file
-- `.delete(path)` -- delete a file
-  **Config:**
-- `config/limiter.ts` supports a `default` disk plus a `disks` map; ships with `local`, `public`, and `s3` examples
-- Per-operation `LimiterOptions` cover S3-specific concerns (`acl`, `limiterClass`, `partSize`, `queueSize`, `retry`, `virtualHostedStyle`, etc.) as well as local options (`mode`, `createPath`)
-- `LimiterDiskDriverEnum` (`Local` | `S3`) used to identify the driver per disk
+**`RateLimiterBuilder`:**
+- `.setKey(key)` -- set the cache key identifying the thing being limited
+- `.setLimit(limit)` -- set the max number of attempts allowed within the duration
+- `.setDuration(duration)` -- set the time window in seconds
+- `.attempt(callback)` -- increment the attempt counter and run `callback` if still under the limit; throws when exceeded
+- `.tooManyAttempts()` -- check whether the current count has already exceeded the limit, without incrementing it
+- `.clear()` -- reset the counter for a key
+
+**`RateLimiter` facade (static API, built on `RateLimiterBuilder`):**
+- `RateLimiter.attempt(key, limit, callback, duration?)`
+- `RateLimiter.tooManyAttempts(key, limit, duration?)`
+- `RateLimiter.clear(key)`
+
+**Config:**
+- `config/limiter.ts` defines default `limit` (60) and `duration` (60 seconds), copied into the consuming project's `config/` directory via the package's configure step
   **Error handling:**
-- `LimiterException` -- thrown for missing/invalid config, unsupported drivers, and missing required arguments; logs via `@bejibun/logger` before throwing
+- `RateLimiterException` -- thrown for an invalid/missing callback or when an attempt exceeds the limit (default HTTP code `429`); logs via `@bejibun/logger` before throwing
 
 **Dependencies:**
 - `@bejibun/app ^0.1.24`
+- `@bejibun/cache ^0.1.24`
 - `@bejibun/logger ^0.1.22`
 - `@bejibun/utils ^0.1.28`
 
