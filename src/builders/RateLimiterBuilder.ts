@@ -31,13 +31,13 @@ export default class RateLimiterBuilder {
         return this;
     }
 
-    public async attempt(callback: Function): Promise<any> {
+    public async attempt(callback: () => {}): Promise<any> {
         const count = Number(await Cache.increment(this.key, this.duration));
 
         const canExecute = count <= this.limit;
 
         if (isNotEmpty(callback) && typeof callback === "function") {
-            if (canExecute) return await callback();
+            if (canExecute) return callback();
         } else {
             throw new RateLimiterException("Invalid callback.");
         }

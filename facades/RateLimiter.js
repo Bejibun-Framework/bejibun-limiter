@@ -16,8 +16,6 @@ export default class RateLimiter {
             .tooManyAttempts();
     }
     static async clear(key) {
-        return await new RateLimiterBuilder()
-            .setKey(key)
-            .clear();
+        return await new RateLimiterBuilder().setKey(key).clear();
     }
 }

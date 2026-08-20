@@ -6,7 +6,7 @@ export default class RateLimiterBuilder {
     setKey(key: string): RateLimiterBuilder;
     setLimit(limit: number): RateLimiterBuilder;
     setDuration(duration: number): RateLimiterBuilder;
-    attempt(callback: Function): Promise<any>;
+    attempt(callback: () => {}): Promise<any>;
     tooManyAttempts(): Promise<boolean>;
     clear(): Promise<void>;
 }

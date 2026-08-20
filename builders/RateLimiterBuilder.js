@@ -27,7 +27,7 @@ export default class RateLimiterBuilder {
         const canExecute = count <= this.limit;
         if (isNotEmpty(callback) && typeof callback === "function") {
             if (canExecute)
-                return await callback();
+                return callback();
         }
         else {
             throw new RateLimiterException("Invalid callback.");
